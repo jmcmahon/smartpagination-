@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+    "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<sqlMap namespace="UserSQL">
+    <sql id="oracle_pagination_head">
+		<dynamic>
+			<isNotEmpty property="paginationStart">
+			    <isNotEmpty property="paginationEnd">
+				 <![CDATA[select * from ( select row_.*, rownum rownum_ from ( ]]>
+				</isNotEmpty>
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<sql id="oracle_pagination_tail">
+		<dynamic>
+			<isNotEmpty property="paginationStart">
+			    <isNotEmpty property="paginationEnd">	
+				 <![CDATA[) row_ where rownum <= #paginationEnd# ) where rownum_ > #paginationStart#]]>
+				</isNotEmpty>
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<sql id="hsql_pagination_limit">
+		<dynamic>
+			<isNotEmpty property="offset">
+			    <isNotEmpty property="limit">
+			     <![CDATA[ limit #offset# #limit# ]]>
+				</isNotEmpty>
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<sql id="user_model_where">
+		<dynamic>
+			<isNotEmpty property="userName" prepend=" and ">
+				<isEqual property="userNameLike" compareValue="true">lower(user_Name) like #userName#</isEqual>
+				<isNotEqual property="userNameLike" compareValue="true">user_Name = #userName#</isNotEqual>
+			</isNotEmpty>
+			<isNotEmpty property="email" prepend=" and ">lower(email) like #email#</isNotEmpty>
+			<isNotEmpty property="realName" prepend=" and ">lower(real_Name) like #realName#</isNotEmpty>
+			<isNotEmpty property="sex" prepend=" and ">sex=#sex#</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<sql id="orderBy">
+		<dynamic>
+			<isNotEmpty property="orderByStr" prepend=" order by "> $orderByStr$ </isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<select id="countUser"
+		parameterClass="org.powerstone.smartpagination.ibatis.UserModelIbatisQuery"
+		resultClass="java.lang.Integer">
+		select count(id) from user_model where 1=1 
+		<include refid="user_model_where" />
+	</select>
+	
+	<select id="hsql_findUsers"
+		parameterClass="org.powerstone.smartpagination.ibatis.UserModelIbatisQuery"
+		resultClass="org.powerstone.smartpagination.sample.UserModel">
+		select 
+		<include refid="hsql_pagination_limit" /> 
+		id,user_Name as userName,email,real_Name as realName,sex,birth
+		from user_model where 1=1 
+		<include refid="user_model_where" />
+		<include refid="orderBy" />
+	</select>
+	
+	<select id="oracle_findUsers"
+		parameterClass="org.powerstone.smartpagination.ibatis.UserModelIbatisQuery"
+		resultClass="org.powerstone.smartpagination.sample.UserModel">
+		<include refid="oracle_pagination_head" />
+		select id,user_Name as userName,email,real_Name as realName,sex,birth
+		from user_model where 1=1 
+		<include refid="user_model_where" />
+		<include refid="orderBy" />
+		<include refid="oracle_pagination_tail" />
+	</select>
+</sqlMap>

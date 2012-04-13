@@ -1,0 +1,160 @@
+<project name="smart_pagination" default="compile" xmlns:ivy="antlib:org.apache.ivy.ant">
+	<!-- ivy properties used -->
+	<property name="publish.version" value="0.1" />
+	<property name="ivy.report.todir" value="build" />
+	<property name="repository.dir" value="d:/Local_Repository" />
+	<property name="build.debug" value="on" />
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="lib.dir" value="${basedir}/lib" />
+	<property name="web.dir" value="web" />
+	<property name="test.dir" value="build/test" />
+
+	<ivy:settings file="ivysettings.xml" />
+
+	<path id="lib.path.id">
+		<fileset dir="${lib.dir}">
+		</fileset>
+		<pathelement path="${classes.dir}" />
+	</path>
+
+	<target name="resolve" description="--> resolve and retrieve dependencies with ivy">
+		<ivy:resolve file="ivy.xml" conf="*" />
+		<ivy:retrieve pattern="${lib.dir}/[conf]/[artifact]-[revision].[ext]" />
+	</target>
+
+	<target name="report" depends="resolve" description="--> resolve and retrieve dependencies with ivy">
+		<ivy:report />
+	</target>
+
+	<target name="compile" depends="resolve" description="--> description">
+		<mkdir dir="${classes.dir}" />
+		<javac encoding="utf-8" destdir="${classes.dir}" classpathref="lib.path.id" debug="${build.debug}">
+			<src path="src" />
+		</javac>
+		<copy todir="${classes.dir}">
+			<fileset dir="src">
+				<exclude name="**/*.java" />
+				<exclude name="**/*.properties" />
+			</fileset>
+		</copy>
+		<!-- copy the property files to class path-->
+		<native2ascii src="src" dest="${classes.dir}" includes="*.properties" encoding="UTF-8" />
+		<mkdir dir="${test.dir}" />
+		<javac encoding="utf-8" destdir="${test.dir}" srcdir="test" classpathref="lib.path.id" debug="${build.debug}">
+			<src path="test" />
+		</javac>
+		<copy todir="${test.dir}">
+			<fileset dir="test">
+				<include name="**/*.*" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="jar" depends="compile" description="--> make a jar file for this project">
+		<mkdir dir="dist" />
+		<tstamp>
+			<format property="jar.time" pattern="MM/dd/yyyy hh:mm aa" locale="en" />
+		</tstamp>
+		<buildnumber />
+		<jar destfile="dist/${ant.project.name}.jar">
+			<manifest>
+				<attribute name="Build-Version" value="${publish.version}" />
+				<attribute name="Build-On" value="${jar.time}" />
+				<attribute name="Build-Number" value="${build.number}" />
+			</manifest>
+			<fileset dir="${classes.dir}">
+				<!-- Jar should not include xml and property files -->
+				<exclude name="**/*.xml" />
+				<exclude name="**/*.properties" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="publish" depends="jar" description="publish">
+		<ivy:publish resolver="release" pubrevision="${publish.version}" overwrite="true">
+			<artifacts pattern="dist/[artifact].[ext]" />
+		</ivy:publish>
+		<echo message="project ${ant.project.name} released with version ${publish.version}" />
+	</target>
+
+	<target name="publish-releases" depends="jar">
+		<property name="revision" value="${publish.version}" />
+		<ivy:publish artifactspattern="dist/[artifact].[ext]" resolver="releases" pubrevision="${publish.version}" status="release" update="true" overwrite="true" forcedeliver="true" />
+		<echo message="released with version ${publish.version}" />
+	</target>
+
+	<target name="publish-snapshots" depends="jar">
+		<property name="revision" value="${publish.version}" />
+		<ivy:publish artifactspattern="dist/[artifact].[ext]" resolver="snapshots" pubrevision="${publish.version}-SNAPSHOT" status="release" update="true" overwrite="true" forcedeliver="true" />
+		<echo message="released with version ${publish.version}" />
+	</target>
+
+	<target name="war" depends="compile" description="Packages app as WAR">
+		<mkdir dir="dist" />
+		<war destfile="dist/${ant.project.name}.war" webxml="${web.dir}/WEB-INF/web.xml">
+			<fileset dir="${web.dir}">
+				<include name="**/*.*" />
+				<exclude name="**/web.xml" />
+				<exclude name="**/*Test.class" />
+			</fileset>
+			<lib dir="${lib.dir}/runtime" includes="*.jar" />
+			<classes dir="${classes.dir}" />
+		</war>
+	</target>
+
+	<target name="clean" description="--> clean the project">
+		<delete dir="dist" />
+		<delete dir="${build.dir}" />
+		<delete dir="${lib.dir}" />
+	</target>
+
+	<target name="test" depends="compile" description="Runs JUnit tests">
+		<available classname="junit.framework.TestCase" property="junit.present" />
+		<fail unless="junit.present" message="Please copy ${lib.dir}/test/junit.jar into ${env.ANT_HOME}/lib" />
+		<mkdir dir="${test.dir}/data" />
+		<junit printsummary="yes" fork="yes" errorProperty="test.failed" failureProperty="test.failed">
+			<classpath>
+				<path refid="lib.path.id" />
+				<path location="${test.dir}" />
+			</classpath>
+			<formatter type="xml" />
+			<formatter type="brief" usefile="false" />
+			<batchtest todir="${test.dir}/data" if="testcase">
+				<fileset dir="${test.dir}">
+					<include name="**/*${testcase}*" />
+					<exclude name="**/*TestCase.class" />
+				</fileset>
+			</batchtest>
+			<batchtest todir="${test.dir}/data" unless="testcase">
+				<fileset dir="${test.dir}">
+					<include name="**/*Test.class*" />
+					<exclude name="**/AbstractBaseTest.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+		<test-report report.dir="${test.dir}/reports" data.dir="${test.dir}/data" />
+		<fail if="test.failed">
+			Unit tests failed. For error messages, check the log files in
+			${test.dir}/data.</fail>
+	</target>
+
+	<macrodef name="test-report">
+		<attribute name="data.dir" />
+		<attribute name="report.dir" />
+		<sequential>
+			<mkdir dir="@{report.dir}" />
+			<junitreport todir="@{report.dir}">
+				<fileset dir="@{data.dir}">
+					<include name="TEST-*.xml" />
+				</fileset>
+				<report format="frames" todir="@{report.dir}" />
+			</junitreport>
+		</sequential>
+	</macrodef>
+	<target name="test-reports" description="Generate test reports">
+		<mkdir dir="${test.dir}/reports" />
+		<test-report report.dir="${test.dir}/reports" data.dir="${test.dir}/data" />
+	</target>
+</project>

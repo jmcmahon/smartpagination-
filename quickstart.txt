@@ -1,0 +1,9 @@
+安装JDK：1.5以上，设环境变量JAVA_HOME，添加%JAVA_HOME%/bin到PATH环境变量
+安装Ant：建议1.7，设环境变量ANT_HOME，添加%ANT_HOME%/bin到PATH环境变量
+安装Ivy：下载ivy.jar，放到ANT_HOME/lib
+下载junit.jar放到ANT_HOME/lib
+运行命令：ant test，如果测试成功，说明一切就绪。
+运行命令ant war，成功后把dist下的war包拷贝到tomcat/webapps
+启动tomcat，IE访问http://127.0.0.1:8080/smart_pagination/【界面很简陋】；firefox下分页条不太正常
+进入首页后，点“初始化数据”，又会回到首页
+然后就可以点“简单查询”和“高级查询”了，分别是简单分页功能和复杂条件查询分页功能，并且两个都带排序功能

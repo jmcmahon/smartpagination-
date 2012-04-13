@@ -1,0 +1,68 @@
+<ivy-module version="1.0">
+	<info organisation="org.powerstone" module="smart_pagination" />
+	<configurations>
+		<conf name="default" visibility="public" extends="runtime,master" />
+		<conf name="master" visibility="public" />
+		<conf name="compile" visibility="public" />
+		<conf name="provided" visibility="public" />
+		<conf name="runtime" visibility="public" extends="compile" />
+		<conf name="test" visibility="private" extends="runtime" />
+	</configurations>
+
+	<dependencies
+		defaultconfmapping="compile->compile(*),master(*);runtime->master(*),compile(*),runtime(*)">
+		<dependency org="log4j" name="log4j" rev="1.2.11" conf="compile;runtime" />
+		<dependency org="hsqldb" name="hsqldb" rev="1.8.0.7"
+			conf="compile;runtime" />
+		<dependency org="cglib" name="cglib" rev="2.2" conf="runtime" />
+		<dependency org="cglib" name="cglib-nodep" rev="2.2" conf="runtime" />
+		<dependency org="javassist" name="javassist" rev="3.8.0.GA"
+			conf="runtime" />
+		<dependency org="commons-dbcp" name="commons-dbcp" rev="1.4"
+			conf="runtime" />
+		<dependency org="org.slf4j" name="slf4j-jdk14" rev="1.5.0"
+			conf="runtime" />
+
+		<dependency org="org.springframework" name="spring-orm"
+			rev="3.0.4.RELEASE" conf="compile;runtime" />
+		<dependency org="org.springframework" name="spring-aop"
+			rev="3.0.4.RELEASE" conf="compile;runtime" />
+		<dependency org="org.springframework" name="spring-webmvc"
+			rev="3.0.4.RELEASE" conf="compile;runtime" />
+		<dependency org="org.springframework" name="spring-jdbc"
+			rev="3.0.4.RELEASE" conf="compile;runtime" />
+
+		<dependency org="org.hibernate" name="hibernate-core" rev="3.3.2.GA"
+            conf="compile;runtime" />
+        <dependency org="org.hibernate" name="hibernate-annotations"
+            rev="3.4.0.GA" conf="compile;runtime" />
+        <dependency org="org.hibernate" name="hibernate-entitymanager"
+            rev="3.4.0.GA" conf="compile;runtime" />
+        <dependency org="org.hibernate" name="ejb3-persistence"
+            rev="3.3.2.Beta1" conf="compile;runtime" />
+
+		<dependency org="org.apache.ibatis" name="ibatis-sqlmap"
+			rev="2.3.4.726" conf="compile;runtime" />
+			
+		<dependency org="org.freemarker" name="freemarker" rev="2.3.9"
+            conf="compile;runtime" />
+        <dependency org="javax.servlet" name="jstl" rev="1.1.2"
+			conf="runtime" />
+		<dependency org="taglibs" name="standard" rev="1.1.2"
+			conf="runtime" />
+			
+        <dependency org="org.codehaus.jackson" name="jackson-core-asl" rev="1.7.1" conf="compile;runtime"/>
+        <dependency org="org.codehaus.jackson" name="jackson-mapper-asl" rev="1.7.1" conf="compile;runtime"/>
+
+		<dependency org="junit" name="junit" rev="4.8.2" conf="test->default" />
+		<dependency org="org.springframework" name="spring-test"
+			rev="3.0.4.RELEASE" conf="test->default" />
+		<dependency org="org.mockito" name="mockito-all" rev="1.8.4"
+			conf="test->default" />
+
+		<dependency org="javax.servlet" name="servlet-api" rev="2.5"
+			conf="provided->compile(*),master(*)" />
+		<dependency org="javax.servlet" name="jsp-api" rev="2.0"
+			conf="provided->compile(*),master(*)" />
+	</dependencies>
+</ivy-module>
