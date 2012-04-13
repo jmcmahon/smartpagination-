@@ -6,13 +6,13 @@
 	</ivy:configure>
 	<settings defaultResolver="defaultChain"
 		defaultConflictManager="latest-revision" />
-	<caches defaultCacheDir="d:/.ivy2" />	
+	<caches defaultCacheDir="~/.ivy2" />	
 	<property name="nexus-public"
-		value="http://localhost:8080/nexus/content/groups/public" />
+		value="https://ncimvn.nci.nih.gov/nexus/content/groups/public/" />
 	<property name="nexus-releases"
-		value="http://localhost:8080/nexus/content/repositories/releases" />
+		value="https://ncimvn.nci.nih.gov/nexus/content/groups/releases" />
 	<property name="nexus-snapshots"
-		value="http://localhost:8080/nexus/content/repositories/snapshots" />
+		value="https://ncimvn.nci.nih.gov/nexus/content/groups/snapshots" />
 	<resolvers>
 		<chain name="defaultChain" checkmodified="true" changingPattern=".*SNAPSHOT">
 			<ibiblio name="public" m2compatible="true" usepoms="true"
