@@ -6,7 +6,7 @@
 	</ivy:configure>
 	<settings defaultResolver="defaultChain"
 		defaultConflictManager="latest-revision" />
-	<caches defaultCacheDir="~/.ivy2" />	
+  <caches defaultCacheDir="/Users/jamesmcmahon/.ivy2" />
 	<property name="nexus-public"
 		value="https://ncimvn.nci.nih.gov/nexus/content/groups/public/" />
 	<property name="nexus-releases"
